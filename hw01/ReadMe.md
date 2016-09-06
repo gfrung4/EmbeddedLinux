@@ -7,7 +7,7 @@
 
 ##Instructions
  - Use the arrow keys to control the Etch-A-Sketch.  An **X** will be placed wherever you move!
- - Press `[TB]` to switch to the controls along the bottom, and press `[TAB]` again to switch back.
+ - Press `[TAB]` to switch to the controls along the bottom, and press `[TAB]` again to switch back.
  - Use `[LEFT]` and `[RIGHT]` to move between the options at the bottom.
  - Use `[UP]` and `[DOWN]` to increase and decrease the **width** and **height** when they are selected.
  - Use `[ENTER]` to **clear** or **exit** when those options are selected.
