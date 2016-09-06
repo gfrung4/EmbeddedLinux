@@ -10,26 +10,18 @@ int width = 20;
 int x = width / 2;
 int y = height / 2;
 
-// Last (lx,ly) position of the cursor in the Etch-A-Sketch area
-int lx = 0;
-int ly = 0;
-
-int padLeft, padTop;
-
+// The three windows for the various parts of the application
 WINDOW * win;
 WINDOW * titleWin;
 WINDOW * tabwin;
 
+/* Sets the cursor color to the given color name. */
 void cursor_set_color_string(const char *color) {
         printf("\e]12;%s\a", color);
         fflush(stdout);
 }
 
-void screen_redraw() {
-        clear();
-        refresh();
-}
-
+/* Clears the Etch-A-Sketch. */
 void etch_clear() {
         for(uint8_t i = 0; i < height; i++) {
                 for(uint8_t j = 0; j < width; j++) {
@@ -39,23 +31,31 @@ void etch_clear() {
         }
 }
 
-void calculate_padding() {
-        padLeft = (COLS - width ) / 2;
-        padTop = (LINES - height - 5) / 2 + 1;
-}
-
-void recalculate_padding() {
-        calculate_padding();
-        mvwin(win, padTop, padLeft);
-}
-
-void rerender() {
+/* Redraws everything.  This is only currently necessary after a resize. */
+void etch_rerender() {
         touchwin(stdscr);
         touchwin(win);
         touchwin(titleWin);
         touchwin(tabwin);
-        refresh();
+
+        wrefresh(stdscr);
+        wrefresh(win);
         wrefresh(titleWin);
+        wrefresh(tabwin);
+}
+
+/* Resizes the Etch-A-Sketch. */
+void etch_resize() {
+        // Calculate padding
+        int padLeft = (COLS - width ) / 2;
+        int padTop = (LINES - height - 5) / 2 + 1;
+
+        // Resize and move the window
+        wresize(win, height, width);
+        mvwin(win, padTop, padLeft);
+
+        // Redraw everything
+        etch_rerender();
 }
 
 int main(int argc, char** argv) {
@@ -63,15 +63,17 @@ int main(int argc, char** argv) {
         initscr();
         noecho();
         start_color();
+
+        // Set cursor color to lime
         cursor_set_color_string("lime");
 
-        // Calculate the padding to the left and top of the Etch-A-Sketch
-        calculate_padding();
-
         // Create windows
-        win = newwin(height, width, padTop, padLeft);
+        win = newwin(1, 1, 1, 1);
         titleWin = newwin(1, COLS, 0, 0);
         tabwin = newwin(4, COLS, LINES-4, 0);
+
+        // Calculate the padding to the left and top of the Etch-A-Sketch
+        etch_resize();
 
         // Setup the main window
         keypad(stdscr, TRUE);
@@ -132,9 +134,7 @@ int main(int argc, char** argv) {
         wprintw(tabwin, "switch between panes.");
 
         // Refresh the windows
-        wrefresh(stdscr);
-        wrefresh(titleWin);
-        wrefresh(tabwin);
+        etch_rerender();
 
         // Place an X where the cursor starts
         wmove(win, y, x);
@@ -143,105 +143,99 @@ int main(int argc, char** argv) {
 
         // Begin main loop
         int ch;
-        bool inSketch = true;
         bool redraw = true;
         int selectedTab = -1;
         int lastTab = -1;
         bool done = false;
         while ( !done && (ch = wgetch(win)) != 'q') {
-                switch ( ch ) {
-                case KEY_UP:      // Move cursor UP
-                        if(inSketch) {
+
+                if(selectedTab==-1) {
+                        // The user is drawing
+                        switch ( ch ) {
+                        case KEY_UP: // Move cursor UP
                                 if(y>0) {
                                         y--;
                                         redraw = true;
                                 }
-                        } else {
-                                if(selectedTab==0) {
-                                        if(width<COLS) {
-                                                width++;
-                                                recalculate_padding();
-                                                wresize(win, height, width);
-                                                rerender();
-                                                lastTab = -1;
-                                                redraw = true;
-                                        }
-                                }
-                                if(selectedTab==1) {
-                                        if(height<LINES-5) {
-                                                height++;
-                                                recalculate_padding();
-                                                wresize(win, height, width);
-                                                rerender();
-                                                lastTab = -1;
-                                                redraw = true;
-                                        }
-                                }
-                        }
-                        break;
-                case KEY_DOWN:      // Move cursor DOWN
-                        if(inSketch) {
+                                break;
+                        case KEY_DOWN: // Move cursor DOWN
                                 if(y<height-1) {
                                         y++;
                                         redraw = true;
                                 }
-                        } else {
-                                if(selectedTab==0) {
-                                        if(width>1) {
-                                                width--;
-                                                recalculate_padding();
-                                                wresize(win, height, width);
-                                                rerender();
-                                                lastTab = -1;
-                                                redraw = true;
-                                        }
-                                }
-                                if(selectedTab==1) {
-                                        if(height>1) {
-                                                height--;
-                                                recalculate_padding();
-                                                wresize(win, height, width);
-                                                rerender();
-                                                lastTab = -1;
-                                                redraw = true;
-                                        }
-                                }
-                        }
-                        break;
-                case KEY_LEFT:      // Move cursor LEFT
-                        if(inSketch) {
+                                break;
+                        case KEY_LEFT: // Move cursor LEFT
                                 if(x>0) {
                                         x--;
                                         redraw = true;
                                 }
-                        } else {
-                                if(selectedTab>0) {
-                                        selectedTab--;
-                                        redraw = true;
-                                }
-                        }
-                        break;
-                case KEY_RIGHT:      // Move cursor RIGHT
-                        if(inSketch) {
+                                break;
+                        case KEY_RIGHT: // Move cursor RIGHT
                                 if(x<width-1) {
                                         x++;
                                         redraw = true;
                                 }
-                        } else {
+                                break;
+                        case 9:
+                                selectedTab = 0;
+                                curs_set(0);
+                                redraw = true;
+                                break;
+                        }
+                } else {
+                        switch ( ch ) {
+                        case KEY_UP:        // Increase count
+                                if(selectedTab==0) {
+                                        if(width<COLS) {
+                                                width++;
+                                                etch_resize();
+                                                etch_rerender();
+                                                lastTab = -1; // Forces tab redraw
+                                                redraw = true;
+                                        }
+                                } else if(selectedTab==1) {
+                                        if(height<LINES-5) {
+                                                height++;
+                                                etch_resize();
+                                                etch_rerender();
+                                                lastTab = -1; // Forces tab redraw
+                                                redraw = true;
+                                        }
+                                }
+                                break;
+                        case KEY_DOWN:        // Move cursor DOWN
+                                if(selectedTab==0) {
+                                        if(width>1) {
+                                                width--;
+                                                etch_resize();
+                                                etch_rerender();
+                                                lastTab = -1; // Forces tab redraw
+                                                redraw = true;
+                                        }
+                                } else if(selectedTab==1) {
+                                        if(height>1) {
+                                                height--;
+                                                etch_resize();
+                                                etch_rerender();
+                                                lastTab = -1; // Forces tab redraw
+                                                redraw = true;
+                                        }
+                                }
+                                break;
+                        case KEY_LEFT:        // Move one tab to the LEFT
+                                if(selectedTab>0) {
+                                        selectedTab--;
+                                        redraw = true;
+                                }
+                                break;
+                        case KEY_RIGHT:        // Move one tab to the RIGHT
                                 if(selectedTab<3) {
                                         selectedTab++;
                                         redraw = true;
                                 }
-                        }
-                        break;
-                case 9:
-                        if(inSketch) {
-                                inSketch = false;
-                                selectedTab = 0;
-                                curs_set(0);
-                                redraw = true;
-                        } else {
-                                inSketch = true;
+                                break;
+                        case 9:
+                                selectedTab = -1;
                                 curs_set(1);
                                 redraw = true;
 
@@ -251,23 +245,21 @@ int main(int argc, char** argv) {
                                 if(y>=height) {
                                         y = height-1;
                                 }
-                        }
-                        break;
-                case 10:
-                        if(!inSketch) {
+                                break;
+                        case 10:
                                 if(selectedTab==3) {
                                         done = true;
                                 }
                                 if(selectedTab==2) {
                                         etch_clear();
                                 }
+                                break;
                         }
-                        break;
                 }
 
                 // If the cursor has moved, move it and place an X
                 if(redraw) {
-                        if(inSketch) {
+                        if(selectedTab==-1) {
                                 wmove(win, y, x);
                                 wprintw(win, "X");
                                 wmove(win, y, x);
@@ -336,10 +328,8 @@ int main(int argc, char** argv) {
                                         wrefresh(tabwin);
                                         break;
                                 }
-
                                 lastTab = selectedTab;
                         }
-
                         redraw = false;
                 }
         }
