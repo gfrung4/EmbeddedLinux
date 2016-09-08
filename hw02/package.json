@@ -1,0 +1,13 @@
+{
+  "name": "etch-a-sketch",
+  "version": "1.0.0",
+  "description": "A simple Etch-A-Sketch implemented in Javascript.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ricky Rung",
+  "dependencies": {
+    "bonescript": "^0.5.0"
+  }
+}
