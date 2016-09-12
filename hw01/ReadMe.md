@@ -14,3 +14,9 @@
 
 ##Notes
 I was able to complete all of 1 through 6 on the homework.
+
+==========
+Comments by Prof. Yoder
+Wow, very colorful.  Nicely done!
+
+Grade:  10/10
