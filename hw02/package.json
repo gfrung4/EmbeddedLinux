@@ -8,6 +8,7 @@
   },
   "author": "Ricky Rung",
   "dependencies": {
+    "blessed": "^0.1.81",
     "bonescript": "^0.5.0"
   }
 }
