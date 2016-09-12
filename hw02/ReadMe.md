@@ -1,5 +1,5 @@
 #HW02: Buttons and LEDs
-![Demo Screenshot](https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw02/demo.gif)
+<img src="https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw02/demo.gif" width="640">
 
 ##Compile and Run
 1. Download all the files and put them in the same directory on your Beaglebone.
