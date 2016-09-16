@@ -1,5 +1,5 @@
 #HW01: Etch-a-sketch
-![Demo Screenshot](https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw01/demo.gif)
+<img src="https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw01/demo.gif" width="640">
 
 ##Compile and Run
 1. Download the **src.cpp** file and the **compile.sh** file and put them in the same directory on your Beaglebone.
@@ -14,3 +14,9 @@
 
 ##Notes
 I was able to complete all of 1 through 6 on the homework.
+
+==========
+Comments by Prof. Yoder
+Wow, very colorful.  Nicely done!
+
+Grade:  10/10

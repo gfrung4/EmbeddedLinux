@@ -1,5 +1,5 @@
 #HW02: Buttons and LEDs
-![Demo Screenshot](https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw02/demo.gif)
+<img src="https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw02/demo.gif" width="640">
 
 ##Compile and Run
 1. Download all the files and put them in the same directory on your Beaglebone.
@@ -22,3 +22,27 @@
  - Use `[UP]` and `[DOWN]` to increase and decrease the **width** and **height** when they are selected.
  - Use `[ENTER]` to **clear** or **exit** when those options are selected.
  - The buttons in the wiring section can be used instead of the `[UP]`, `[DOWN]`, `[RIGHT]`, and `[LEFT]` keys.
+
+==========
+Comments from Prof. Yoder
+
+It looks well structured, but I'm getting the error below.  Plese demo in class.
+
+Grade: 2/10 (so far) 
+
+node main.js 
+Initializing...
+[0 q[0 q]112Error: EIO, i/o error
+  at Error (native)
+  at Object.fs.writeSync (fs.js:613:20)
+  at Object.fs.writeFileSync (fs.js:1108:21)
+  at Object.exports.exportGPIOControls (/usr/local/lib/node_modules/bonescript/src/hw_mainline.js:136:8)
+  at Object.f.pinMode (/usr/local/lib/node_modules/bonescript/src/index.js:191:19)
+  at Object.<anonymous> (/root/studentWork/rung/hw02/main.js:239:7)
+  at Module._compile (module.js:460:26)
+  at Object.Module._extensions..js (module.js:478:10)
+  at Module.load (module.js:355:32)
+  at Function.Module._load (module.js:310:12)
+  at Function.Module.runMain (module.js:501:10)
+  at startup (node.js:129:16)
+  at node.js:814:3
