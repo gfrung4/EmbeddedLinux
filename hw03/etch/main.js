@@ -78,6 +78,12 @@ function pressDown() {
     } else {
         if (tabSelected === 0) {
             if (etch.getWidth() > 1) {
+                if (etch.getWidth() <= 8) {
+                    for (var i = 0; i < 8; i++) {
+                        matrix.set(etch.getWidth() - 1, i, 'black');
+                    }
+                    matrix.update();
+                }
                 etch.resize(etch.getWidth() - 1, etch.getHeight());
                 calculate_padding();
                 draw_etch();
@@ -85,6 +91,12 @@ function pressDown() {
             draw_tabs();
         } else if (tabSelected === 1) {
             if (etch.getHeight() > 1) {
+                if (etch.getHeight() <= 8) {
+                    for (var i = 0; i < 8; i++) {
+                        matrix.set(i, etch.getHeight() - 1, 'black');
+                    }
+                    matrix.update();
+                }
                 etch.resize(etch.getWidth(), etch.getHeight() - 1);
                 calculate_padding();
                 draw_etch();
