@@ -33,3 +33,14 @@
  - Use `[UP]` and `[DOWN]` to increase and decrease the **width** and **height** when they are selected.
  - Use `[ENTER]` to **clear** or **exit** when those options are selected.
  - The buttons in the wiring section can be used instead of the `[UP]`, `[DOWN]`, `[RIGHT]`, and `[LEFT]` keys.
+
+==========
+Comments from Prof. Mark A. Yoder
+
+I get a 404 error on the screenshot.
+Nice documentation and great work on all the parts.  So far you are the only one
+to get the TMP006 working and demoed.
+
+Thanks for figuring out the i2c package.
+
+Grade:  11/10
