@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script type="text/javascript" src="https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/wi2c/client.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <title>Matrix Canvas</title>
+    <script type='text/javascript'>
+        window.onload = function() {
+            // Possible pixel colors
+            var colors = ["#776D69", "#FF2616", "#46E902", "#FFD000"];
+
+            // Starting selected color
+            var selectedColor = 1;
+
+            // Variables for how to display the GUI
+            var selectionSize = 10;
+            var swatchSeparation = 20;
+            var pixelSeparation = 10;
+
+            // The matrix to store the color of each pixel (starts out all black)
+            var matrix = zeros([8, 8]);
+
+            // Other variables, to be set on document ready
+            var canvas, ctx, w, h, pixelSize, pixelSpace, swatchSize, swatchSpace, selectionAbsoluteSize;
+
+            $(document).ready(function() {
+                canvas = document.getElementById('matrixCanvas');
+                ctx = canvas.getContext('2d');
+                w = canvas.width;
+                h = canvas.height;
+
+                canvas.addEventListener('mousedown', canvasClick, false);
+                canvas.addEventListener('mousemove', canvasMove, false);
+
+                pixelSize = (100 * h) / (800 + 7 * pixelSeparation);
+                pixelSpace = pixelSize * (pixelSeparation / 100 + 1);
+
+                swatchSize = (100 * h) / (400 + 5 * swatchSeparation);
+                swatchSpace = swatchSize * (swatchSeparation / 100 + 1);
+
+                selectionAbsoluteSize = (swatchSize * selectionSize / 100);
+
+                draw();
+            });
+
+            function canvasClick(event) {
+                // Get the clicked point
+                var x = event.pageX - event.target.offsetLeft;
+                var y = event.pageY - event.target.offsetTop;
+
+                // Check to see if we've clicked a color swatch
+                for (var i = 0; i < 4; i++) {
+                    if (pointIn(x, y, w - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2)) {
+                        selectedColor = i;
+                        draw();
+                    }
+                }
+
+                // Check to see if we've clicked a matrix pixel
+                for (var i = 0; i < 8; i++) {
+                    for (var j = 0; j < 8; j++) {
+                        if (pointIn(x, y, i * pixelSpace, j * pixelSpace, pixelSize, pixelSize)) {
+                            matrix[i][j] = selectedColor;
+                            draw();
+                        }
+                    }
+                }
+            }
+
+            function canvasMove(event) {
+                if (event.buttons !== 0) {
+                    // Get the clicked point
+                    var x = event.pageX - event.target.offsetLeft;
+                    var y = event.pageY - event.target.offsetTop;
+
+                    // Check to see if we've clicked a matrix pixel
+                    for (var i = 0; i < 8; i++) {
+                        for (var j = 0; j < 8; j++) {
+                            if (pointIn(x, y, i * pixelSpace, j * pixelSpace, pixelSize, pixelSize)) {
+                                matrix[i][j] = selectedColor;
+                                draw();
+                            }
+                        }
+                    }
+                }
+            }
+
+            function pointIn(x, y, x1, y1, w, h) {
+                return x >= x1 && y >= y1 && x <= (x1 + w) && y <= (y1 + h);
+            }
+
+            function draw() {
+                // Draw background
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(0, 0, w, h);
+
+                // Draw color swatches
+                for (var i = 0; i < 4; i++) {
+                    if (i === selectedColor) {
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect(w - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2);
+                    }
+                    ctx.fillStyle = colors[i];
+                    ctx.fillRect(w - swatchSpace, (swatchSize * swatchSeparation / 100) + i * swatchSpace, swatchSize, swatchSize);
+                }
+
+                // Draw matrix pixels
+                for (var i = 0; i < 8; i++) {
+                    for (var j = 0; j < 8; j++) {
+                        ctx.fillStyle = colors[matrix[i][j]];
+                        ctx.fillRect(i * pixelSpace, j * pixelSpace, pixelSize, pixelSize);
+                    }
+                }
+
+                // Update the LED matrix on draw() if we're connected to it
+                if (running) {
+                    doUpdate();
+                }
+            }
+
+            function zeros(dimensions) {
+                var array = [];
+
+                for (var i = 0; i < dimensions[0]; ++i) {
+                    array.push(dimensions.length == 1 ? 0 : zeros(dimensions.slice(1)));
+                }
+
+                return array;
+            }
+
+            /*
+            Code to control the LED matrix
+            */
+            var wire;
+            var running = false;
+
+            setTargetAddress('192.168.7.2', {
+                initialized: run
+            });
+
+            function run() {
+                wire = new i2c(0x70, {
+                    device: '/dev/i2c-2'
+                }, function() {
+                    setupMatrix();
+                });
+            }
+
+            function setupMatrix() {
+                wire.writeByte(0x21, function(err) {
+                    wire.writeByte(0x81, function(err) {
+                        wire.writeByte(0xe7, function(err) {
+                            running = true;
+                            doUpdate();
+                        });
+                    });
+                });
+            }
+
+            function doUpdate() {
+                var result = [];
+                for (var i = 7; i >= 0; i--) {
+                    var red = 0;
+                    var green = 0;
+                    for (var j = 0; j < 8; j++) {
+                        red += (matrix[i][j] % 2) * Math.pow(2, j);
+                        green += Math.floor((matrix[i][j] / 2)) * Math.pow(2, j);
+                    }
+                    result.push(green);
+                    result.push(red);
+                }
+                wire.writeBytes(0x00, result, function(err) {
+
+                });
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+    <canvas id="matrixCanvas" width="384" height="300" />
+</body>
+
+</html>
