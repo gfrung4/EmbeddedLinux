@@ -16,8 +16,10 @@
  - Run `node main`.  This requires that the modules `express`, `socket.io`, and `i2c@0.2.1` are installed.
  - Change the port in the code from `80` to another port if port `80` is being used by another program.
  - Browse to `192.168.7.2` in your browser.  Append the port if you changed it from `80`.
+ - Choose a color from the four options on the right.
  - Draw by clicking on the pixels!  The changes are shown on the LED matrix in real time.
- - Choose a color from the right side to draw with a different color.
+ - Drag the white square up and down to change the brightness of the whole display.
+ - Click the refresh button to update the on-screen display from the LED matrix.
 
 ##Question Responses
 1. The browser uses two Socket.IO message types to communicate with boneServer.js.
@@ -29,11 +31,11 @@
    * The `on` class is either added to, or removed from, the table cell representing the pixel to change its color.
 3. The `on` class in matrixLED.css is used to color the LED green when it is lit.
 4. I wrote my code before `boneServer.js` was working.  It uses entirely my own setup, and does not rely on `boneServer.js`.  My code uses `wi2c.js` to manipulate I2C on the Beaglebone, which has Socket.IO events for each of the functions in the i2c library.
-   * new
-   * writeByte
-   * writeBytes
-   * readByte
-   * readBytes
-   * write
-   * read
+   * `new`
+   * `writeByte`
+   * `writeBytes`
+   * `readByte`
+   * `readBytes`
+   * `write`
+   * `read`
 5. I did not use `boneServer.js` for my code.  I used `wi2c.js` to control the LED matrix connected to my Beaglebone.

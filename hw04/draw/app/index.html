@@ -6,6 +6,9 @@
     <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script type="text/javascript" src="https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/wi2c/client.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
     <title>Matrix Canvas</title>
     <script type='text/javascript'>
         window.onload = function() {
@@ -19,6 +22,10 @@
             var selectionSize = 10;
             var swatchSeparation = 20;
             var pixelSeparation = 10;
+
+            var brightnessSliderPosition = 1;
+            var brightnessSliderDragging = -1;
+            var brightness = 15;
 
             // The matrix to store the color of each pixel (starts out all black)
             var matrix = zeros([8, 8]);
@@ -42,7 +49,7 @@
                 swatchSpace = swatchSize * (swatchSeparation / 100 + 1);
 
                 selectionAbsoluteSize = (swatchSize * selectionSize / 100);
-
+                
                 draw();
             });
 
@@ -51,9 +58,15 @@
                 var x = event.pageX - event.target.offsetLeft;
                 var y = event.pageY - event.target.offsetTop;
 
+                // Check to see if we've clicked refresh
+                if (pointIn(x, y, 388, swatchSize * swatchSeparation / 100, swatchSize, swatchSize)) {
+                    console.log("Refresh from display.");
+                    doUpdateFromMatrix();
+                }
+
                 // Check to see if we've clicked a color swatch
                 for (var i = 0; i < 4; i++) {
-                    if (pointIn(x, y, w - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2)) {
+                    if (pointIn(x, y, 384 - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2)) {
                         selectedColor = i;
                         draw();
                     }
@@ -67,6 +80,11 @@
                             draw();
                         }
                     }
+                }
+
+                // Check to see if we've clicked the brightness slider
+                if (pointIn(x, y, 400, 84 + (h - 12 - 84 - 35) * (1 - brightnessSliderPosition), 35, 35)) {
+                    brightnessSliderDragging = y - (84 + (h - 12 - 84 - 35) * (1 - brightnessSliderPosition));
                 }
             }
 
@@ -85,6 +103,14 @@
                             }
                         }
                     }
+
+                    if (brightnessSliderDragging !== -1) {
+                        brightnessSliderPosition = 1 - Math.max(Math.min((y - brightnessSliderDragging - 84) / (h - 12 - 84 - 35), 1), 0);
+                        doBrightnessUpdate();
+                        draw();
+                    }
+                } else {
+                    brightnessSliderDragging = -1;
                 }
             }
 
@@ -97,14 +123,27 @@
                 ctx.fillStyle = "#000000";
                 ctx.fillRect(0, 0, w, h);
 
+                // Draw brightness slider
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(400, 84 + (h - 12 - 84 - 35) * (1 - brightnessSliderPosition), 35, 35);
+                ctx.fillRect(415, 84, 5, h - 12 - 84);
+
+                ctx.fillStyle = "#FFFFFF"
+                ctx.fillRect(388, swatchSize * swatchSeparation / 100, swatchSize, swatchSize);
+                ctx.fillStyle = "#000000"
+                ctx.font = '36px FontAwesome';
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText('\uf021', 388 + swatchSize / 2, swatchSize * swatchSeparation / 100 + swatchSize / 2);
+
                 // Draw color swatches
                 for (var i = 0; i < 4; i++) {
                     if (i === selectedColor) {
                         ctx.fillStyle = "#FFFFFF";
-                        ctx.fillRect(w - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2);
+                        ctx.fillRect(384 - swatchSpace - selectionAbsoluteSize, (swatchSize * swatchSeparation / 100) + i * swatchSpace - selectionAbsoluteSize, swatchSize + selectionAbsoluteSize * 2, swatchSize + selectionAbsoluteSize * 2);
                     }
                     ctx.fillStyle = colors[i];
-                    ctx.fillRect(w - swatchSpace, (swatchSize * swatchSeparation / 100) + i * swatchSpace, swatchSize, swatchSize);
+                    ctx.fillRect(384 - swatchSpace, (swatchSize * swatchSeparation / 100) + i * swatchSpace, swatchSize, swatchSize);
                 }
 
                 // Draw matrix pixels
@@ -152,10 +191,35 @@
             function setupMatrix() {
                 wire.writeByte(0x21, function(err) {
                     wire.writeByte(0x81, function(err) {
-                        wire.writeByte(0xe7, function(err) {
+                        wire.writeByte(0xef, function(err) {
                             running = true;
                             doUpdate();
                         });
+                    });
+                });
+            }
+
+            function setBrightness(brightness) {
+                console.log("Setting brightness to " + brightness);
+                wire.writeBytes(0xe0 + brightness, 0x01, function() {});
+            }
+
+            function doUpdateFromMatrix() {
+                wire.writeByte(0x00, function(err, res) {
+                    wire.read(16, function(err, res) {
+                        for (var i = 7; i >= 0; i--) {
+                            for (var j = 0; j < 8; j++) {
+                                matrix[7 - i][j] = 0;
+                                if (((1 << j) & res[2 * i + 1]) !== 0) {
+                                    matrix[7 - i][j] += 1;
+                                }
+                                if (((1 << j) & res[2 * i]) !== 0) {
+                                    matrix[7 - i][j] += 2;
+                                }
+                            }
+                        }
+                        draw();
+                        console.log(res);
                     });
                 });
             }
@@ -176,13 +240,21 @@
 
                 });
             }
+
+            function doBrightnessUpdate() {
+                var newBrightness = Math.max(Math.min(Math.floor(brightnessSliderPosition * 16), 15), 0);
+                if (newBrightness !== brightness) {
+                    brightness = newBrightness;
+                    setBrightness(newBrightness);
+                }
+            }
         }
     </script>
 
 </head>
 
 <body>
-    <canvas id="matrixCanvas" width="384" height="300" />
+    <canvas id="matrixCanvas" width="460" height="300" />
 </body>
 
 </html>
