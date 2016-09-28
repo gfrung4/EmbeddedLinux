@@ -37,7 +37,7 @@
 ==========
 Comments from Prof. Mark A. Yoder
 
-I get a 404 error on the screenshot.
+I get a 404 error on the screenshot. (resolved)
 Nice documentation and great work on all the parts.  So far you are the only one
 to get the TMP006 working and demoed.
 
