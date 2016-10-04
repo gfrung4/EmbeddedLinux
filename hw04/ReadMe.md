@@ -39,3 +39,11 @@
    * `write`
    * `read`
 5. I did not use `boneServer.js` for my code.  I used `wi2c.js` to control the LED matrix connected to my Beaglebone.
+
+==========
+Prof. Yoder's comments
+Very well done.  Nicely documented.
+I don't see the Memory Map like figure 2-5.
+Otherwise it looks very good.
+
+Grade:  10/10
