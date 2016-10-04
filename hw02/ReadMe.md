@@ -29,6 +29,7 @@ Comments from Prof. Yoder
 It looks well structured, but I'm getting the error below.  Plese demo in class.
 
 Grade: 2/10 (so far) 
+Grade: 10/10 (now)
 
 node main.js 
 Initializing...
