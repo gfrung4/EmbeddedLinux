@@ -1,5 +1,5 @@
 #HW05: Make, Kernel, Cross-Compiling, and The Cloud
-![Demo Screenshot](https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw05/demo.gif)
+![Demo Screenshot](https://dl.dropboxusercontent.com/u/8521871/hosted/beaglebone/hw05/demo.png)
 
 ##Make
  - The `Makefile`, along with required files to run it, are included in the `make` folder.
