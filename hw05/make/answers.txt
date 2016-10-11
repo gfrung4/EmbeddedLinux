@@ -1,0 +1,23 @@
+This file contains the answers to the two questions asked in the Make exercise
+on http://elinux.org/EBC_Exercise_15_make
+
+---------------------------------[ Question 1 ]---------------------------------
+
+beagle$ gcc –g –c app.c –o app.o
+
+In the above gcc command, name the target, dependency and command.
+
+----------------------------------[ Answer 1 ]----------------------------------
+
+Target     =  app.o
+Dependency =  app.c
+Command    =  gcc
+
+---------------------------------[ Question 2 ]---------------------------------
+
+What does the –c option (from the previous step) tell the compiler to do?
+
+----------------------------------[ Answer 2 ]----------------------------------
+
+Produce .o files only, rather than an executable.  The source files are compiled
+but not linked.
