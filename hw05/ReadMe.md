@@ -32,3 +32,10 @@ This address (0x2102c) is in our data section
  - It is expected that one temperature sensor has `ADD0` grounded, and the other temperature sensor has `ADD0` connected to 3.3 volts.
  - The raw data can be [viewed here](http://rose.engineer:8080/streams/28KO4mjOAGfMabmO0al2coLo4jm).
  - A plot of the data can be viewed at the [JSFiddle here](http://jsfiddle.net/pLa9ncwv/).
+
+==========
+Prof. Yoder's comments
+Looks good and complete.
+I've yet to figure out how to get u-boot to work.
+
+Grade:  10/10
