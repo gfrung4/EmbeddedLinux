@@ -20,6 +20,9 @@ for (i = 0; i < motor.length; i++) {
 b.pinMode(start, b.INPUT, 7, 'pulldown');
 b.attachInterrupt(start, true, b.CHANGE, pressStart);
 
+// Read once, seems to fail the first time
+readPhototransistor();
+
 var mode = 0;
 
 function pressStart(evt) {
