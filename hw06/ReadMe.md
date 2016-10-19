@@ -12,3 +12,9 @@
  - Hold the infrared LED pointing at the stepper and press the `Start` button.  The word `Scanning` will appear in the console, and the stepper motor will make one full clockwise turn.  It will then turn counterclockwise to face the LED.
  - The word `Tracking` will appear in the console, and the stepper motor will turn to follow the LED as it is moved.
  - Pushing the `Start` button at this point will trigger `Scanning` mode again.
+
+==========
+Prof. Yoder's comments
+Looks good and complete.
+
+Grade:  10/10
