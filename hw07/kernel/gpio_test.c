@@ -48,7 +48,7 @@ static void __exit ebbgpio_exit(void){
 }
 
 static irq_handler_t ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs){
-   gpio_set_value(gpioLED, !gpio_get_value(gpioButton));
+   gpio_set_value(gpioLED, gpio_get_value(gpioButton));
    return (irq_handler_t) IRQ_HANDLED;
 }
 
