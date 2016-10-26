@@ -39,7 +39,6 @@ TARGETS		=$(PRU0_FW)
 
 # add the required files while linkin the FW code
 # required linking files for PRU0
-LINK_PRU0_FW= $(GEN_DIR)/pru0-ledButton.object
 # required linking files for PRU1
 LINK_PRU1_FW= 
 
@@ -64,12 +63,6 @@ $(GEN_DIR)/main_pru0.object: main_pru0.c
 	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
 
 $(GEN_DIR)/main_pru1.object: main_pru1.c
-	@mkdir -p $(GEN_DIR)
-	@echo 'CC	$<'
-	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
-
-
-$(GEN_DIR)/pru0-ledButton.object: pru0-ledButton.asm
 	@mkdir -p $(GEN_DIR)
 	@echo 'CC	$<'
 	@$(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
