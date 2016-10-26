@@ -5,11 +5,7 @@ Four different implementations of reading the value of P9_28 and copying it to P
 ##Compile and Run
 Included are four folders, one for each implementation.  To be consistent, each folder contains a `run.sh` script that will run the code.  This script handles any setup and compiling that is necessary for that specific implementation.
 
-To run these scripts, use the following to test each implementation:
-- `./js/run.sh`
-- `./c/run.sh`
-- `./kernel/run.sh`
-- `./pru/run.sh`
+To run each implementation, `cd` into its directory and run `./run.sh`.
 
 Note that the kernel module is not unloaded, and the PRU is not stopped.  No scripts are included to do this, so these modules will continue to run until stopped manually.
 
