@@ -10,3 +10,11 @@ To run each implementation, `cd` into its directory and run `./run.sh`.
 Note that the kernel module is not unloaded, and the PRU is not stopped.  No scripts are included to do this, so these modules will continue to run until stopped manually.
 
 Included in the report.pdf are timing and percent CPU usage for each implementation, as well as oscilloscope screenshots.
+
+==========
+Prof. Yoder's comments
+Nice plots.  Min and Max times weren't reported.
+run.sh is a nice touch.
+
+Grade:  10/10
+
